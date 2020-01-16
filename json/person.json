@@ -1,0 +1,26 @@
+{
+  "id": "1001",
+  "name": "vpn",
+  "age": 25,
+  "places": [
+    "India",
+    "US"
+  ],
+  "images": [
+    {
+      "id": 10,
+      "name": "image1"
+    },
+    {
+      "id": 12,
+      "name": "image2"
+    }
+  ],
+  "address": {
+    "street_no": "1222",
+    "details": {
+      "house_no": 3334,
+      "town": "Test Town"
+    }
+  }
+}
