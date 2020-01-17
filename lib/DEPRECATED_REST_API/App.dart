@@ -68,8 +68,8 @@ class LoginState extends State<Login> {
                                 );
                               });
                         } else {
-                          final userWithUserNameExists = users.any((u) =>
-                              u['username'] == _usernameController.text);
+                          final userWithUserNameExists = users.any(
+                              (u) => u['username'] == _usernameController.text);
                           if (userWithUserNameExists) {
                             Navigator.push(
                                 context,
@@ -110,8 +110,142 @@ class posts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Container(
-      color: Colors.white,
+    return Scaffold(
+      appBar: AppBar(
+          title: Text(
+        'Posts',
+      )),
+      body: FutureBuilder(
+        future: ApiService.getPostList(),
+        builder: (context, snapshots) {
+          if (snapshots.connectionState == ConnectionState.done) {
+            final posts = snapshots.data;
+            return ListView.separated(
+              separatorBuilder: (context, index) {
+                return Divider(
+                  height: 2,
+                  color: Colors.black,
+                );
+              },
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(
+                    posts[index]['title'],
+                    style: TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(posts[index]['body']),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              posts_details(posts[index]['id']),
+                        ));
+                  },
+                );
+              },
+              // ignore: missing_return
+              itemCount: posts.length,
+            );
+          }
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class posts_details extends StatelessWidget {
+  final int _id;
+
+  posts_details(this._id);
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Post Details'),
+      ),
+      body: ListView(
+        physics: BouncingScrollPhysics(),
+        children: <Widget>[
+          FutureBuilder(
+            future: ApiService.getPost(_id),
+            builder: (context, snapshots) {
+              if (snapshots.connectionState == ConnectionState.done) {
+                return Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        snapshots.data['title'] as String,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 30),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        snapshots.data['body'] as String,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                    ),
+                    Divider(),
+                    SizedBox(height: 20),
+                  ],
+                );
+              }
+              return Padding(
+                padding: const EdgeInsets.all(28.0),
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            },
+          ),
+          FutureBuilder(
+            future: ApiService.getCommentForPosts(_id),
+            builder: (context, snapshots) {
+              if (snapshots.connectionState == ConnectionState.done) {
+                final comments = snapshots.data;
+                return ListView.separated(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.vertical,
+                  separatorBuilder: (context, index) {
+                    return Divider(
+                      height: 2,
+                      color: Colors.black,
+                    );
+                  },
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(
+                        comments[index]['name'],
+                        style: TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(comments[index]['body']),
+                    );
+                  },
+                  // ignore: missing_return
+                  itemCount: 10,
+                );
+              }
+              return Padding(
+                padding: const EdgeInsets.all(28.0),
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 }
