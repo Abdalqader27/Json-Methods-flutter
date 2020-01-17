@@ -67,4 +67,14 @@ class ApiService {
       return null;
     }
   }
+
+  static Future<bool> addPost(Map<String, dynamic> post) async {
+    try {
+      final response =
+          await http.post('${Urls.BASE_API_URL}/posts', body: post);
+      return response.statusCode == 201;
+    } catch (e) {
+      return false;
+    }
+  }
 }
